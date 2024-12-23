@@ -58,8 +58,13 @@ struct CreateNoteView: View {
                 Spacer()
                 
                 Button(action: {
-                    viewModel.addNote(title: title, content: content)
-                    dismiss()
+                    viewModel.addNote(title: title, content: content) { success in
+                           if success {
+                               dismiss()
+                           } else {
+                               print("Error creating note")
+                           }
+                       }
                 }) {
                     Text("Save")
                         .font(.headline)
@@ -78,12 +83,5 @@ struct CreateNoteView: View {
             .navigationBarTitleDisplayMode(.inline)
             .padding(.horizontal, 16)
         }
-    }
-}
-
-struct CreateNoteView_Previews: PreviewProvider {
-    static var previews: some View {
-        let mockViewModel = NotesViewModel()
-        return CreateNoteView(viewModel: mockViewModel)
     }
 }

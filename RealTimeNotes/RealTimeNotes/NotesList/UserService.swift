@@ -7,10 +7,10 @@
 
 import Foundation
 
-class UserService {
+final class UserService {
     private static let userIdKey = "userId"
 
-    // Получить уникальный идентификатор пользователя
+    // MARK: - Get user identifier
     static func getUserId() -> String {
         if let storedUserId = UserDefaults.standard.string(forKey: userIdKey) {
             return storedUserId

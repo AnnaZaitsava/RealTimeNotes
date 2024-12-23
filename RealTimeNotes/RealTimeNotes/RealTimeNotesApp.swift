@@ -18,6 +18,7 @@ struct RealTimeNotesApp: App {
     var body: some Scene {
         WindowGroup {
             NotesListView()
+                .preferredColorScheme(.light)
         }
     }
 }
