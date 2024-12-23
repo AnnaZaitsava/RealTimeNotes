@@ -86,7 +86,7 @@ final class NotesViewModel: ObservableObject {
     // MARK: - Add Note
     func addNote(title: String, content: String, completion: @escaping (Bool) -> Void) {
         let newNote = Note(
-            title: title,
+            title: title.isEmpty ? "New Note" : title,
             content: content,
             date: Date(),
             userId: self.userId
@@ -115,7 +115,7 @@ final class NotesViewModel: ObservableObject {
         }
         
         var updatedNote = note
-        updatedNote.title = title
+        updatedNote.title = title.isEmpty ? "New Note" : title
         updatedNote.content = content
         updatedNote.date = Date()
         
