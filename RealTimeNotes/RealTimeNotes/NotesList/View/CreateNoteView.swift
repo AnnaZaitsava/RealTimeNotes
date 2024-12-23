@@ -58,8 +58,13 @@ struct CreateNoteView: View {
                 Spacer()
                 
                 Button(action: {
-                    viewModel.addNote(title: title, content: content)
-                    dismiss()
+                    viewModel.addNote(title: title, content: content) { success in
+                           if success {
+                               dismiss()
+                           } else {
+                               print("Error creating note")
+                           }
+                       }
                 }) {
                     Text("Save")
                         .font(.headline)

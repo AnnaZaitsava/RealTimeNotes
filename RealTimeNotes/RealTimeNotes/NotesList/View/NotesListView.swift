@@ -4,11 +4,15 @@
 //
 //  Created by Anna Zaitsava on 22.12.24.
 //
+
 import SwiftUI
+import FirebaseFirestore
 
 struct NotesListView: View {
     @StateObject private var viewModel = NotesViewModel()
     @State private var isShowingCreateNoteView = false
+    @State private var isShowingEditNoteView = false
+    @State private var selectedNote: Note? = nil
     private var currentUserId = UserService.getUserId()
     
     var body: some View {
@@ -89,6 +93,10 @@ struct NotesListView: View {
                                 .stroke(Color.black, lineWidth: 1)
                         )
                         .listRowSeparator(.hidden)
+                        .onTapGesture {
+                            selectedNote = note
+                            isShowingEditNoteView.toggle()
+                        }
                     }
                     .onDelete(perform: deleteNote)
                 }
@@ -105,73 +113,22 @@ struct NotesListView: View {
             .sheet(isPresented: $isShowingCreateNoteView) {
                 CreateNoteView(viewModel: viewModel)
             }
+            .sheet(isPresented: $isShowingEditNoteView) {
+                if let noteToEdit = selectedNote {
+                    EditNotesView(note: Binding(
+                        get: { noteToEdit },
+                        set: { selectedNote = $0 }
+                    ), viewModel: viewModel)
+                }
+            }
+
         }
     }
     
     private func deleteNote(at offsets: IndexSet) {
         offsets.forEach { index in
             let note = viewModel.notes[index]
-            viewModel.deleteNote(note) // Вызов функции удаления заметки из ViewModel
+            viewModel.deleteNote(note)
         }
     }
 }
-
-
-//
-//import SwiftUI
-//struct NotesListView: View {
-//    @StateObject private var viewModel = NotesViewModel()
-//    @State private var isShowingCreateNoteView = false
-//    private var currentUserId = UserService.getUserId()
-//
-//
-//    var body: some View {
-//        NavigationView {
-//            List {
-//                ForEach(viewModel.notes) { note in
-//                    HStack {
-//                        Text(note.title)
-//                        Spacer()
-//
-//                        if note.userId == currentUserId {
-//                            Text("You")
-//                                .foregroundColor(.gray)
-//                        }
-//                    }
-//                    .swipeActions {
-//                        Button(role: .destructive) {
-//                            viewModel.deleteNote(note)
-//                        } label: {
-//                            Label("Delete", systemImage: "trash")
-//                        }
-//                    }
-//                }
-//            }
-//            .navigationTitle("Notes List")
-//            .onAppear {
-//                viewModel.loadNotes()
-//                viewModel.listenForUpdates()
-//            }
-//            .onDisappear {
-//                viewModel.stopListening()
-//            }
-//            .toolbar {
-//                ToolbarItem(placement: .navigationBarTrailing) {
-//                    Button(action: {
-//                        isShowingCreateNoteView.toggle()
-//                    }) {
-//                        Image("addIcon")
-//                            .resizable()
-//                            .frame(width: 50, height: 50)
-//                            .padding(.trailing, 16)
-//                    }
-//                }
-//            }
-//            .sheet(isPresented: $isShowingCreateNoteView) {
-//                CreateNoteView(viewModel: viewModel)
-//            }
-//        }
-//    }
-//}
-
-

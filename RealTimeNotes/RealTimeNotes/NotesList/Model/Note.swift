@@ -8,11 +8,12 @@
 import Foundation
 import FirebaseFirestore
 
-struct Note: Identifiable, Codable {
+struct Note: Identifiable, Codable, Hashable {
     @DocumentID var id: String?
     var title: String
     var content: String
     var date: Date
     var userId: String
+    var lockedBy: String?
 }
 
