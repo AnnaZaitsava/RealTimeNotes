@@ -11,9 +11,7 @@ import FirebaseFirestore
 struct NotesListView: View {
     @StateObject private var viewModel = NotesViewModel()
     @State private var isShowingCreateNoteView = false
-    @State private var isShowingEditNoteView = false
     @State private var selectedNote: Note? = nil
-    
     private var currentUserId = UserService.getUserId()
     
     private var isEditViewPresented: Binding<Bool> {
@@ -43,6 +41,29 @@ struct NotesListView: View {
                 }
                 .padding(.top, 16)
                 .padding(.horizontal, 16)
+                
+                if viewModel.notes.isEmpty {
+                    VStack(alignment: .center, spacing: 12) {
+                        Text("Oops, it’s empty :(")
+                            .font(.system(size: 20, weight: .black))
+                            .foregroundColor(.black)
+                        
+                        Text("Create the first note by tapping the button")
+                            .font(.system(size: 15, weight: .light))
+                            .foregroundColor(.gray)
+                        
+                        Button(action: {
+                            isShowingCreateNoteView.toggle()
+                        }) {
+                            Image("addIcon")
+                                .resizable()
+                                .frame(width: 35, height: 35)
+                        }
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+                    .multilineTextAlignment(.center)
+                }
                 
                 List {
                     ForEach(viewModel.notes) { note in
@@ -128,11 +149,10 @@ struct NotesListView: View {
                     ), viewModel: viewModel)
                 }
             }
-
-            
         }
     }
     
+    //MARK: - Delete Note 
     private func deleteNote(at offsets: IndexSet) {
         offsets.forEach { index in
             let note = viewModel.notes[index]
