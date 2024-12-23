@@ -85,10 +85,3 @@ struct CreateNoteView: View {
         }
     }
 }
-
-struct CreateNoteView_Previews: PreviewProvider {
-    static var previews: some View {
-        let mockViewModel = NotesViewModel()
-        return CreateNoteView(viewModel: mockViewModel)
-    }
-}

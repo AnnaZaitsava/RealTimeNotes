@@ -39,7 +39,7 @@ struct EditNotesView: View {
                     Spacer()
                     HStack {
                         Image(systemName: "lock.fill")
-                            .foregroundColor(.green)
+                            .foregroundColor(.black)
                             .font(.system(size: 24))
                     }
                 }

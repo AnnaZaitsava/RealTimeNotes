@@ -13,7 +13,15 @@ struct NotesListView: View {
     @State private var isShowingCreateNoteView = false
     @State private var isShowingEditNoteView = false
     @State private var selectedNote: Note? = nil
+    
     private var currentUserId = UserService.getUserId()
+    
+    private var isEditViewPresented: Binding<Bool> {
+        Binding(
+            get: { selectedNote != nil },
+            set: { if !$0 { selectedNote = nil } }
+        )
+    }
     
     var body: some View {
         NavigationView {
@@ -95,7 +103,6 @@ struct NotesListView: View {
                         .listRowSeparator(.hidden)
                         .onTapGesture {
                             selectedNote = note
-                            isShowingEditNoteView.toggle()
                         }
                     }
                     .onDelete(perform: deleteNote)
@@ -113,7 +120,7 @@ struct NotesListView: View {
             .sheet(isPresented: $isShowingCreateNoteView) {
                 CreateNoteView(viewModel: viewModel)
             }
-            .sheet(isPresented: $isShowingEditNoteView) {
+            .sheet(isPresented: isEditViewPresented) {
                 if let noteToEdit = selectedNote {
                     EditNotesView(note: Binding(
                         get: { noteToEdit },
@@ -122,6 +129,7 @@ struct NotesListView: View {
                 }
             }
 
+            
         }
     }
     
