@@ -1,8 +1,8 @@
 //
-//  EditNote.swift
-//  RealTimeNotes
+//  EditScreen.swift
+//  RealTimeNote
 //
-//  Created by Anna Zaitsava on 22.12.24.
+//  Created by Anna Zaitsava on 23.12.24.
 //
 
 import SwiftUI
@@ -91,7 +91,7 @@ struct EditNotesView: View {
         }
         .onDisappear {
             viewModel.stopEditing(note: originalNote)
-            viewModel.stopListening()
+            viewModel.stopListening(noteId: originalNote.id)
         }
     }
 }

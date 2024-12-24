@@ -2,7 +2,7 @@
 //  NotesListView.swift
 //  RealTimeNotes
 //
-//  Created by Anna Zaitsava on 22.12.24.
+//  Created by Anna Zaitsava on 23.12.24.
 //
 
 import SwiftUI
@@ -42,7 +42,13 @@ struct NotesListView: View {
                 .padding(.top, 16)
                 .padding(.horizontal, 16)
                 
-                if viewModel.notes.isEmpty {
+                if viewModel.isFetching {
+                    ProgressView()
+                        .tint(Color.neonGreen)
+                        .scaleEffect(3)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(Color.white.edgesIgnoringSafeArea(.all))
+                } else if viewModel.notes.isEmpty {
                     VStack(alignment: .center, spacing: 12) {
                         Text("Oops, it’s empty :(")
                             .font(.system(size: 20, weight: .black))
@@ -63,78 +69,80 @@ struct NotesListView: View {
                     .padding()
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
                     .multilineTextAlignment(.center)
-                }
-                
-                List {
-                    ForEach(viewModel.notes) { note in
-                        VStack(alignment: .leading, spacing: 6) {
-                            HStack {
-                                Text(note.title)
-                                    .font(.system(size: 16, weight: .medium))
-                                    .foregroundColor(.black)
-                                    .lineLimit(1)
-                                    .truncationMode(.tail)
-                                
-                                Spacer()
-                                
-                                Text(note.date, style: .date)
-                                    .font(.system(size: 12, weight: .light))
-                                    .foregroundColor(.gray)
-                            }
-                            
-                            if note.userId == currentUserId {
+                } else {
+                    
+                    List {
+                        ForEach(viewModel.notes) { note in
+                            VStack(alignment: .leading, spacing: 6) {
                                 HStack {
-                                    Text(note.content)
-                                        .font(.system(size: 12, weight: .light))
-                                        .foregroundColor(.gray)
+                                    Text(note.title)
+                                        .font(.system(size: 16, weight: .medium))
+                                        .foregroundColor(.black)
                                         .lineLimit(1)
                                         .truncationMode(.tail)
                                     
                                     Spacer()
                                     
-                                    Text("You")
-                                        .font(.system(size: 12, weight: .light))
-                                        .foregroundColor(.black)
-                                        .padding(.horizontal, 10)
-                                        .padding(.vertical, 4)
-                                        .background(Color("neonGreen"))
-                                        .cornerRadius(8)
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: 8)
-                                                .stroke(Color.black, lineWidth: 1)
-                                        )
-                                }
-                            } else {
-                                HStack {
-                                    Text(note.content)
+                                    Text(note.date, style: .date)
                                         .font(.system(size: 12, weight: .light))
                                         .foregroundColor(.gray)
-                                        .lineLimit(1)
-                                    
-                                    Spacer()
+                                }
+                                
+                                if note.userId == currentUserId {
+                                    HStack {
+                                        Text(note.content)
+                                            .font(.system(size: 12, weight: .light))
+                                            .foregroundColor(.gray)
+                                            .lineLimit(1)
+                                            .truncationMode(.tail)
+                                        
+                                        Spacer()
+                                        
+                                        Text("You")
+                                            .font(.system(size: 12, weight: .light))
+                                            .foregroundColor(.black)
+                                            .padding(.horizontal, 10)
+                                            .padding(.vertical, 4)
+                                            .background(Color.neonGreen)
+                                            .cornerRadius(8)
+                                            .overlay(
+                                                RoundedRectangle(cornerRadius: 8)
+                                                    .stroke(Color.black, lineWidth: 1)
+                                            )
+                                    }
+                                } else {
+                                    HStack {
+                                        Text(note.content)
+                                            .font(.system(size: 12, weight: .light))
+                                            .foregroundColor(.gray)
+                                            .lineLimit(1)
+                                        
+                                        Spacer()
+                                    }
                                 }
                             }
+                            .padding(.vertical, 10)
+                            .padding(.horizontal, 14)
+                            .background(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .stroke(Color.black, lineWidth: 1)
+                            )
+                            .listRowSeparator(.hidden)
+                            .onTapGesture {
+                                selectedNote = note
+                            }
                         }
-                        .padding(.vertical, 10)
-                        .padding(.horizontal, 14)
-                        .background(
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(Color.black, lineWidth: 1)
-                        )
-                        .listRowSeparator(.hidden)
-                        .onTapGesture {
-                            selectedNote = note
-                        }
+                        .onDelete(perform: deleteNote)
                     }
-                    .onDelete(perform: deleteNote)
+                    .listStyle(PlainListStyle())
                 }
-                .listStyle(PlainListStyle())
             }
             .background(Color.white.edgesIgnoringSafeArea(.all))
             .onAppear {
                 viewModel.loadNotes()
                 viewModel.listenForUpdates()
             }
+            
             .onDisappear {
                 viewModel.stopListening()
             }
@@ -149,10 +157,10 @@ struct NotesListView: View {
                     ), viewModel: viewModel)
                 }
             }
+            
         }
     }
     
-    //MARK: - Delete Note 
     private func deleteNote(at offsets: IndexSet) {
         offsets.forEach { index in
             let note = viewModel.notes[index]
